@@ -47,11 +47,13 @@ public class FtdiSerialDriver implements UsbSerialDriver {
 
     @Override
     public UsbDevice getDevice() {
+        Log.d(TAG,"mDevice: "+mDevice);
         return mDevice;
     }
 
     @Override
     public List<UsbSerialPort> getPorts() {
+        Log.d(TAG,"mPorts: "+mPorts);
         return mPorts;
     }
 
@@ -89,6 +91,7 @@ public class FtdiSerialDriver implements UsbSerialDriver {
         private int breakConfig = 0;
 
         public FtdiSerialPort(UsbDevice device, int portNumber) {
+            Log.d(TAG,"device : "+device + " PortNumber: "+portNumber);
             super(device, portNumber);
         }
 
@@ -107,7 +110,9 @@ public class FtdiSerialDriver implements UsbSerialDriver {
                 throw new IOException("Not enough endpoints");
             }
             mReadEndpoint = mDevice.getInterface(mPortNumber).getEndpoint(0);
+            Log.d(TAG,"mReadEndpoint: "+mReadEndpoint );
             mWriteEndpoint = mDevice.getInterface(mPortNumber).getEndpoint(1);
+            Log.d(TAG,"mWriteEndpoint: "+mWriteEndpoint);
 
             int result = mConnection.controlTransfer(REQTYPE_HOST_TO_DEVICE, RESET_REQUEST,
                     RESET_ALL, mPortNumber+1, null, 0, USB_WRITE_TIMEOUT_MILLIS);
@@ -141,6 +146,7 @@ public class FtdiSerialDriver implements UsbSerialDriver {
 
         @Override
         public int read(final byte[] dest, final int timeout) throws IOException {
+            Log.d(TAG,"In Read func. Data(dest): "+dest );
             if(dest.length <= READ_HEADER_LENGTH) {
                 throw new IllegalArgumentException("Read buffer to small");
                 // could allocate larger buffer, including space for 2 header bytes, but this would
@@ -160,6 +166,7 @@ public class FtdiSerialDriver implements UsbSerialDriver {
                     nread = super.read(dest, timeout, false);
                 } while (nread == READ_HEADER_LENGTH);
             }
+            Log.d(TAG,"to be feed to readfilter: dest(data): "+dest + "nread : "+nread);
             return readFilter(dest, nread);
         }
 
