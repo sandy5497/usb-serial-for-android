@@ -160,8 +160,10 @@ public abstract class CommonUsbSerialPort implements UsbSerialPort {
     protected void testConnection() throws IOException {
         byte[] buf = new byte[2];
         int len = mConnection.controlTransfer(0x80 /*DEVICE*/, 0 /*GET_STATUS*/, 0, 0, buf, buf.length, 200);
-        if(len < 0)
+        if(len < 0){
+            Log.d(TAG,"In testConnection & length is less than 0");
             throw new IOException("USB get_status request failed");
+        }
     }
 
     @Override
@@ -170,6 +172,8 @@ public abstract class CommonUsbSerialPort implements UsbSerialPort {
     }
 
     protected int read(final byte[] dest, final int timeout, boolean testConnection) throws IOException {
+        Log.d(TAG,"In Read Function mConnection: "+ mConnection);
+        Log.d(TAG," data = " + dest);
         if(mConnection == null) {
             throw new IOException("Connection closed");
         }
@@ -178,6 +182,7 @@ public abstract class CommonUsbSerialPort implements UsbSerialPort {
         }
         final int nread;
         if (timeout != 0) {
+            Log.d(TAG,"Read function timeout != 0");
             // bulkTransfer will cause data loss with short timeout + high baud rates + continuous transfer
             //   https://stackoverflow.com/questions/9108548/android-usb-host-bulktransfer-is-losing-data
             // but mConnection.requestWait(timeout) available since Android 8.0 es even worse,
@@ -188,7 +193,9 @@ public abstract class CommonUsbSerialPort implements UsbSerialPort {
             // data loss / crashes were observed with timeout up to 200 msec
             long endTime = testConnection ? MonotonicClock.millis() + timeout : 0;
             int readMax = Math.min(dest.length, MAX_READ_SIZE);
+            Log.d(TAG,"Read function: mReadEndpoint : "+mReadEndpoint + "Dest(data): " + dest + "readMax: "+readMax);
             nread = mConnection.bulkTransfer(mReadEndpoint, dest, readMax, timeout);
+            Log.d(TAG,"nread = :"+nread);
             // Android error propagation is improvable:
             //  nread == -1 can be: timeout, connection lost, buffer to small, ???
             if(nread == -1 && testConnection && MonotonicClock.millis() < endTime)
@@ -210,6 +217,7 @@ public abstract class CommonUsbSerialPort implements UsbSerialPort {
                 testConnection();
             }
         }
+        Log.d(TAG,"Read End nread :"+nread);
         return Math.max(nread, 0);
     }
 
@@ -217,6 +225,7 @@ public abstract class CommonUsbSerialPort implements UsbSerialPort {
     public void write(final byte[] src, final int timeout) throws IOException {
         int offset = 0;
         final long endTime = (timeout == 0) ? 0 : (MonotonicClock.millis() + timeout);
+        Log.d(TAG,"In write function");
 
         if(mConnection == null) {
             throw new IOException("Connection closed");
@@ -250,6 +259,7 @@ public abstract class CommonUsbSerialPort implements UsbSerialPort {
                 if (requestTimeout < 0) {
                     actualLength = -2;
                 } else {
+                    Log.d(TAG,"mWriteEndpoint:"+ mWriteEndpoint + "writeBuffer:" + writeBuffer);
                     actualLength = mConnection.bulkTransfer(mWriteEndpoint, writeBuffer, requestLength, requestTimeout);
                 }
             }
@@ -265,7 +275,9 @@ public abstract class CommonUsbSerialPort implements UsbSerialPort {
                     throw new IOException("Error writing " + requestLength + " bytes at offset " + offset + " of total " + src.length);
                 }
             }
+            Log.d(TAG,"offset before adding actualLength : "+offset + "ActualLength: "+ actualLength);
             offset += actualLength;
+            Log.d(TAG,"offset after adding actualLength : "+offset + "ActualLength: " + actualLength);
         }
     }
 
