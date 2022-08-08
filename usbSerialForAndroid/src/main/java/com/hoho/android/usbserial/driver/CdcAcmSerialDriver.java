@@ -140,18 +140,26 @@ public class CdcAcmSerialDriver implements UsbSerialDriver {
             for (int i = 0; i < mDevice.getInterfaceCount(); i++) {
                 UsbInterface usbInterface = mDevice.getInterface(i);
                 if (usbInterface.getInterfaceClass() == UsbConstants.USB_CLASS_COMM) {
+                    Log.d(TAG,"usbInterface.getInterfaceClass() == UsbConstants.USB_CLASS_COMM are equal");
                     if(controlInterfaceCount == mPortNumber) {
                         mControlIndex = i;
                         mControlInterface = usbInterface;
+                        Log.d(TAG,"mControlInterface : "+mControlInterface);
                     }
                     controlInterfaceCount++;
+                    Log.d(TAG,"controlInterfaceCount : "+controlInterfaceCount);
                 }
+                else Log.d(TAG,"usbInterface.getInterfaceClass() == UsbConstants.USB_CLASS_COMM is not equal");
                 if (usbInterface.getInterfaceClass() == UsbConstants.USB_CLASS_CDC_DATA) {
+                    Log.d(TAG,"usbInterface.getInterfaceClass() == UsbConstants.USB_CLASS_CDC_DATA are equal");
                     if(dataInterfaceCount == mPortNumber) {
                         mDataInterface = usbInterface;
+                        Log.d(TAG,"mDataInterface :"+mDataInterface);
                     }
                     dataInterfaceCount++;
+                    Log.d(TAG," dataInterfaceCount :"+dataInterfaceCount);
                 }
+                else Log.d(TAG,"usbInterface.getInterfaceClass() == UsbConstants.USB_CLASS_CDC_DATA is not equal");
             }
 
             if(mControlInterface == null) {
@@ -164,6 +172,7 @@ public class CdcAcmSerialDriver implements UsbSerialDriver {
             }
 
             mControlEndpoint = mControlInterface.getEndpoint(0);
+            Log.d(TAG,"mControlEndpoint : "+mControlEndpoint);
             if (mControlEndpoint.getDirection() != UsbConstants.USB_DIR_IN || mControlEndpoint.getType() != UsbConstants.USB_ENDPOINT_XFER_INT) {
                 throw new IOException("Invalid control endpoint");
             }
@@ -179,16 +188,23 @@ public class CdcAcmSerialDriver implements UsbSerialDriver {
 
             for (int i = 0; i < mDataInterface.getEndpointCount(); i++) {
                 UsbEndpoint ep = mDataInterface.getEndpoint(i);
-                if (ep.getDirection() == UsbConstants.USB_DIR_IN && ep.getType() == UsbConstants.USB_ENDPOINT_XFER_BULK)
+                Log.d(TAG,"UsbEndpoints ep= "+ep);
+                if (ep.getDirection() == UsbConstants.USB_DIR_IN && ep.getType() == UsbConstants.USB_ENDPOINT_XFER_BULK){
                     mReadEndpoint = ep;
-                if (ep.getDirection() == UsbConstants.USB_DIR_OUT && ep.getType() == UsbConstants.USB_ENDPOINT_XFER_BULK)
+                    Log.d(TAG,"mReadEndpoint + "mReadEndpoint);
+                }
+                if (ep.getDirection() == UsbConstants.USB_DIR_OUT && ep.getType() == UsbConstants.USB_ENDPOINT_XFER_BULK){
                     mWriteEndpoint = ep;
+                    Log.d(TAG,"mWriteEndpoint +"mWriteEndpoint);
+                }
             }
         }
 
         private int sendAcmControlMessage(int request, int value, byte[] buf) throws IOException {
+            Log.d(TAG,"in sendAcmControlMsg fun ");
             int len = mConnection.controlTransfer(
                     USB_RT_ACM, request, value, mControlIndex, buf, buf != null ? buf.length : 0, 5000);
+            Log.d(TAG, "len : "+len);
             if(len < 0) {
                 throw new IOException("controlTransfer failed");
             }
