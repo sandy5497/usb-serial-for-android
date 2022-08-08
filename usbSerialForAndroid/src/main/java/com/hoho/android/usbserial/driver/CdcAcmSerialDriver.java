@@ -57,11 +57,13 @@ public class CdcAcmSerialDriver implements UsbSerialDriver {
 
     @Override
     public UsbDevice getDevice() {
+        Log.d(TAG,"mDevice: "+mDevice);
         return mDevice;
     }
 
     @Override
     public List<UsbSerialPort> getPorts() {
+        Log.d(TAG,"mPorts: "+mPorts);
         return mPorts;
     }
 
