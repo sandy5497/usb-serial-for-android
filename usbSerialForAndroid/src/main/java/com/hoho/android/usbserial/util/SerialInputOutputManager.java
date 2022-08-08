@@ -149,6 +149,7 @@ public class SerialInputOutputManager implements Runnable {
      */
     public void writeAsync(byte[] data) {
         synchronized (mWriteBufferLock) {
+            Log.d(TAG,"data : "+data);
             mWriteBuffer.put(data);
         }
     }
@@ -234,6 +235,7 @@ public class SerialInputOutputManager implements Runnable {
                 listener.onNewData(data);
             }
         }
+        else Log.d(TAG,"Read data len is 0");
 
         // Handle outgoing data.
         buffer = null;
@@ -245,6 +247,7 @@ public class SerialInputOutputManager implements Runnable {
                 mWriteBuffer.get(buffer, 0, len);
                 mWriteBuffer.clear();
             }
+            else Log.d(TAG,"Write buff len is 0");
         }
         if (buffer != null) {
             if (DEBUG) {
