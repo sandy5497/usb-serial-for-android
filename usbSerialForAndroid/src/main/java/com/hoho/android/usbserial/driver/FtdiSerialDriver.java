@@ -91,7 +91,6 @@ public class FtdiSerialDriver implements UsbSerialDriver {
         private int breakConfig = 0;
 
         public FtdiSerialPort(UsbDevice device, int portNumber) {
-            Log.d(TAG,"device : "+device + " PortNumber: "+portNumber);
             super(device, portNumber);
         }
 
