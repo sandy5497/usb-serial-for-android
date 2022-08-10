@@ -193,11 +193,11 @@ public class CdcAcmSerialDriver implements UsbSerialDriver {
                 Log.d(TAG,"UsbEndpoints ep= "+ep);
                 if (ep.getDirection() == UsbConstants.USB_DIR_IN && ep.getType() == UsbConstants.USB_ENDPOINT_XFER_BULK){
                     mReadEndpoint = ep;
-                    Log.d(TAG,"mReadEndpoint + "mReadEndpoint);
+                    Log.d(TAG,"mReadEndpoint "+mReadEndpoint);
                 }
                 if (ep.getDirection() == UsbConstants.USB_DIR_OUT && ep.getType() == UsbConstants.USB_ENDPOINT_XFER_BULK){
                     mWriteEndpoint = ep;
-                    Log.d(TAG,"mWriteEndpoint +"mWriteEndpoint);
+                    Log.d(TAG,"mWriteEndpoint "+mWriteEndpoint);
                 }
             }
         }
